@@ -1,0 +1,35 @@
+.wp-block-button__link {
+  background-color: #32373c;
+  border: none;
+  border-radius: 28px;
+  box-shadow: none;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 18px;
+  margin: 0;
+  overflow-wrap: break-word;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  line-height: 21px;
+  color: #fff;
+}
+
+.mce-item-table td, .mce-item-table th {
+  font-family: 'Poppins';
+  color: #222;
+  font-size: 16px;
+  padding: .64286rem .71429rem;
+  text-align: left;
+  border: 1px solid;
+  min-width: 255px;
+  line-height: 1.6;
+}
+
+.mce-item-table{
+  border: none;
+}
+body{
+  font-family: 'Poppins';
+}

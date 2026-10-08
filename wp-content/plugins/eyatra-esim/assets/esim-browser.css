@@ -1,0 +1,723 @@
+/* eYatra eSIM browser
+   Styles are self-contained and prefixed `ey-esim-` so they cannot collide
+   with the Voip theme. Colours use theme-neutral greys plus a single accent,
+   so the later branding pass can restyle one variable. */
+
+.eyatra-esim {
+  --ey-accent: #022463;
+  --ey-accent-hover: #011a4d;
+  --ey-border: #e2e6ee;
+  --ey-bg-soft: #f6f8fc;
+  --ey-text: #1f2430;
+  --ey-muted: #6b7280;
+
+  color: var(--ey-text);
+  margin: 0 0 2rem;
+}
+
+.ey-esim-head { margin-bottom: 1.25rem; }
+.ey-esim-head h2 { margin: 0 0 .35rem; }
+.ey-esim-sub { color: var(--ey-muted); margin: 0; }
+
+/* ---------- filters ---------- */
+.ey-esim-filters {
+  background: var(--ey-bg-soft);
+  border: 1px solid var(--ey-border);
+  border-radius: 10px;
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* Three fixed rows, two fields each, instead of one auto-fit grid. Row grouping
+   lives in the markup (fieldset.ey-esim-filter-row) so the visual order and the
+   DOM order stay the same for keyboard and screen-reader users. */
+.ey-esim-filter-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .85rem;
+  align-items: end;
+  border: 0;
+  margin: 0 0 .85rem;
+  padding: 0;
+  min-width: 0;
+}
+.ey-esim-filter-row:last-of-type { margin-bottom: 0; }
+
+/* Visually hide the row legends but keep them for assistive tech. */
+.ey-esim-filter-row > legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The Reset button is taller than its label, so let it sit on the field baseline
+   the way a labelled input does rather than floating mid-cell. */
+.ey-esim-field-reset { justify-content: flex-end; }
+
+.ey-esim-field { display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+
+.ey-esim-field label {
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ey-muted);
+}
+
+.ey-esim-field input,
+.ey-esim-field select {
+  width: 100%;
+  /* The Voip theme resets input[type="search"] back to box-sizing:content-box
+     (app.css, alongside hr and .gallery-caption), so the theme's global
+     border-box does not reach the search box. Without this the search field's
+     width:100% resolves to its CONTENT width and the padding and border are
+     added on top, making Search render about 23px wider than the select beside
+     it. Forcing border-box on both controls keeps them equal. */
+  box-sizing: border-box;
+  padding: .55rem .65rem;
+  border: 1px solid var(--ey-border);
+  border-radius: 6px;
+  background: #fff;
+  font-size: .92rem;
+  color: var(--ey-text);
+  min-width: 0;
+}
+
+.ey-esim-field input:focus,
+.ey-esim-field select:focus {
+  outline: 2px solid var(--ey-accent);
+  outline-offset: 1px;
+}
+
+.ey-esim-reset {
+  padding: .55rem 1rem;
+  border: 1px solid var(--ey-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ey-muted);
+  font-size: .88rem;
+  cursor: pointer;
+}
+
+/* The accent hover is gated behind (hover: hover) because on a touch screen
+   :hover stays latched after a tap: tapping Reset would leave the button
+   showing its hover styling even though nothing had changed. */
+@media (hover: hover) {
+  .ey-esim-reset:hover { border-color: var(--ey-accent); color: var(--ey-accent); }
+}
+
+/* A keyboard focus ring only - not a persistent highlight. Clicking Reset leaves
+   it :focus, and an accent outline on :focus would read as the button still
+   being "active" long after the filters were back to their defaults. */
+.ey-esim-reset:focus { outline: none; }
+.ey-esim-reset:focus-visible {
+  outline: 2px solid var(--ey-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- count ---------- */
+.ey-esim-count {
+  color: var(--ey-muted);
+  font-size: .9rem;
+  margin: 0 0 .85rem;
+  padding: 0;
+}
+.ey-esim-count strong { color: var(--ey-text); }
+
+/* ---------- results ---------- */
+.ey-esim-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+  gap: .85rem;
+}
+
+.ey-esim-card {
+  border: 1px solid var(--ey-border);
+  border-radius: 10px;
+  padding: .95rem 1rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+}
+
+.ey-esim-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: .5rem;
+}
+
+.ey-esim-dest { font-weight: 700; font-size: 1rem; line-height: 1.25; }
+
+.ey-esim-badge {
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: .18rem .45rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ey-esim-badge--zone { background: #eef2ff; color: #3538cd; }
+.ey-esim-badge--topup { background: #fdf4e3; color: #92610a; }
+
+.ey-esim-data { font-size: 1.15rem; font-weight: 700; color: var(--ey-accent); }
+
+.ey-esim-meta { font-size: .8rem; color: var(--ey-muted); line-height: 1.45; }
+.ey-esim-meta span { display: block; }
+
+.ey-esim-net {
+  font-size: .76rem;
+  color: var(--ey-muted);
+  background: var(--ey-bg-soft);
+  border-radius: 5px;
+  padding: .35rem .5rem;
+  word-break: break-word;
+}
+
+.ey-esim-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .5rem;
+  margin-top: auto;
+  padding-top: .5rem;
+  border-top: 1px solid var(--ey-border);
+}
+
+.ey-esim-price { font-weight: 700; font-size: 1.05rem; }
+.ey-esim-price small { font-weight: 400; color: var(--ey-muted); font-size: .7rem; }
+
+.ey-esim-buy {
+  border: 0;
+  border-radius: 5px;
+  background: var(--ey-accent);
+  color: #fff;
+  padding: .42rem .8rem;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ey-esim-buy:hover:not(:disabled) { background: var(--ey-accent-hover); }
+
+/* ---------- states ---------- */
+.ey-esim-empty,
+.ey-esim-error,
+.ey-esim-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2.25rem 1rem;
+  color: var(--ey-muted);
+  background: var(--ey-bg-soft);
+  border: 1px dashed var(--ey-border);
+  border-radius: 10px;
+}
+.ey-esim-error { color: #b42318; border-color: #f3c6c2; background: #fdf3f2; }
+
+.ey-esim-more {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: .7rem;
+  border: 1px solid var(--ey-border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ey-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+.ey-esim-more:hover { border-color: var(--ey-accent); }
+
+/* ---------- tabs ---------- */
+.ey-esim-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  margin: 0 0 1rem;
+}
+
+.ey-esim-tab {
+  border: 1px solid var(--ey-border);
+  background: #fff;
+  color: var(--ey-muted);
+  border-radius: 999px;
+  padding: .45rem 1.05rem;
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ey-esim-tab:hover { border-color: var(--ey-accent); color: var(--ey-accent); }
+
+.ey-esim-tab.is-active {
+  background: var(--ey-accent);
+  border-color: var(--ey-accent);
+  color: #fff;
+}
+
+.ey-esim-tab:focus-visible { outline: 2px solid var(--ey-accent); outline-offset: 2px; }
+
+/* ---------- checkout ---------- */
+.ey-esim-checkout-title { margin: 1.6rem 0 .7rem; }
+
+.ey-esim-summary {
+  margin: 0;
+  border: 1px solid var(--ey-border);
+  border-left: 4px solid var(--ey-accent);
+  border-radius: 10px;
+  background: #fbfcff;
+  padding: 1rem 1.15rem;
+}
+
+.ey-esim-summary dt {
+  color: var(--ey-muted);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding-top: .55rem;
+}
+
+.ey-esim-summary dd {
+  margin: 0 0 .15rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* The total is the number the customer is about to pay, so give it room. */
+.ey-esim-summary .ey-esim-summary-price {
+  font-size: 1.15rem;
+  color: var(--ey-accent);
+  margin-bottom: 0;
+}
+
+.ey-esim-summary code,
+.ey-esim-payment code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .95em;
+}
+
+/* ---------- payment ---------- */
+/* Phase L: the block renders visible from page load - it used to ship with
+   [hidden] and be revealed by esim-browser.js on wpcf7mailsent, so the
+   [hidden] rule that hid it is gone with the listener. */
+
+.ey-esim-payment {
+  margin: 1.75rem 0 0;
+  border: 1px solid var(--ey-border);
+  border-left: 4px solid var(--ey-accent);
+  border-radius: 12px;
+  padding: 1.5rem 1.35rem;
+  background: #fbfcff;
+}
+
+.ey-esim-payment h3 { margin: 0 0 .55rem; }
+.ey-esim-payment h4 { margin: 0 0 .6rem; font-size: 1rem; }
+
+.ey-esim-payment-disclosure {
+  max-width: 46rem;
+  margin: 0 0 1.2rem;
+  color: var(--ey-muted);
+  font-size: .92rem;
+  line-height: 1.6;
+}
+
+.ey-esim-payment-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.ey-esim-payment-option { min-width: 0; }
+
+/* The QR source is 600x900 portrait. Rendered at full column width it would be
+   taller than the fold, so cap it and let it shrink on small screens. */
+.ey-esim-qr {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  border: 1px solid var(--ey-border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.ey-esim-payment-hint {
+  margin: .7rem 0 0;
+  font-size: .88rem;
+  color: var(--ey-text);
+}
+
+.ey-esim-payment-terminal {
+  margin: .35rem 0 0;
+  font-size: .82rem;
+  color: var(--ey-muted);
+}
+
+.ey-esim-bank { margin: 0; }
+.ey-esim-bank dt {
+  color: var(--ey-muted);
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding-top: .6rem;
+}
+.ey-esim-bank dd {
+  margin: 0;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* ---------- contact details ---------- */
+.ey-esim-contact {
+  margin-top: 1.5rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--ey-border);
+}
+
+.ey-esim-contact-note {
+  margin: 0 0 .9rem;
+  color: var(--ey-muted);
+  font-size: .9rem;
+}
+
+.ey-esim-contact-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: .35rem;
+}
+
+.ey-esim-contact-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem .9rem;
+  font-size: .92rem;
+}
+
+.ey-esim-contact-key {
+  flex: 0 0 10.5rem;
+  color: var(--ey-muted);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding-top: .2rem;
+}
+
+/* ---------- Contact Form 7, scoped to the checkout form ---------- */
+.ey-esim-checkout-form .wpcf7 { margin: 0; }
+
+/* Contact Form 7 turns each newline in its form template into a literal <br />.
+   Those breaks sat between the fields and rendered a blank line above every
+   input, so the form looked like it had double the spacing it actually had.
+   The labels themselves are kept on one line in the template (see
+   create_enquiry_form.php), so nothing inside a <label> depends on this rule. */
+.ey-esim-checkout-form .wpcf7-form > br { display: none; }
+
+.ey-esim-checkout-form .wpcf7-form > label {
+  display: block;
+  margin-bottom: .55rem;
+}
+
+.ey-esim-checkout-form .wpcf7-form .wpcf7-form-control-wrap { display: block; }
+
+.ey-esim-checkout-form input[type="text"],
+.ey-esim-checkout-form input[type="email"],
+.ey-esim-checkout-form input[type="tel"],
+.ey-esim-checkout-form textarea {
+  width: 100%;
+  max-width: 34rem;
+  box-sizing: border-box;
+  padding: .55rem .65rem;
+  border: 1px solid var(--ey-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ey-text);
+  font-size: .93rem;
+}
+
+.ey-esim-checkout-form input:focus,
+.ey-esim-checkout-form textarea:focus {
+  outline: 2px solid var(--ey-accent);
+  outline-offset: 1px;
+}
+
+.ey-esim-checkout-form textarea { min-height: 7rem; }
+
+.ey-esim-checkout-form .wpcf7-submit {
+  border: 0;
+  border-radius: 6px;
+  background: var(--ey-accent);
+  color: #fff;
+  padding: .65rem 1.4rem;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ey-esim-checkout-form .wpcf7-submit:hover { background: var(--ey-accent-hover); }
+.ey-esim-checkout-form .wpcf7-submit:disabled { opacity: .6; cursor: default; }
+
+.ey-esim-checkout-form .wpcf7-not-valid-tip {
+  color: #b42318;
+  font-size: .82rem;
+  margin: .2rem 0 0;
+}
+
+/* A required CF7 field is marked with an asterisk in its label. Leave it in the
+   accent colour rather than letting it read as an error before anything is
+   submitted. */
+.ey-esim-checkout-form .wpcf7-form-control-wrap .wpcf7-required {
+  color: var(--ey-accent);
+}
+
+.ey-esim-checkout-form .wpcf7-response-output {
+  margin: 0 0 1rem;
+  padding: .7rem .9rem;
+  border: 1px solid var(--ey-border);
+  border-radius: 6px;
+  background: #fff;
+  font-size: .9rem;
+}
+.ey-esim-checkout-form .wpcf7-form.invalid .wpcf7-response-output,
+.ey-esim-checkout-form .wpcf7-form.unaccepted .wpcf7-response-output,
+.ey-esim-checkout-form .wpcf7-form.failed .wpcf7-response-output {
+  border-color: #f3c6c2;
+  background: #fdf3f2;
+  color: #b42318;
+}
+.ey-esim-checkout-form .wpcf7-form.sent .wpcf7-response-output {
+  border-color: #b7e0c2;
+  background: #f1faf3;
+  color: #16643a;
+}
+
+/* ---------- teaser (homepage preview) ---------- */
+.ey-esim-teaser .ey-esim-results {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+
+.ey-esim-teaser-cta { margin: 1.25rem 0 0; text-align: center; }
+
+.ey-esim-teaser-cta a.ey-btn {
+  display: inline-block;
+  background: var(--ey-accent);
+  color: #fff;
+  text-decoration: none;
+  padding: .7rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.ey-esim-teaser-cta a.ey-btn:hover { background: var(--ey-accent-hover); color: #fff; }
+
+/* The Buy button doubles as a link on teaser cards. */
+a.ey-esim-buy {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .ey-esim-results { grid-template-columns: 1fr; }
+  .ey-esim-card-foot { flex-direction: column; align-items: stretch; }
+  .ey-esim-card-foot .ey-esim-buy { width: 100%; }
+
+  /* Two labelled controls per row is too tight on a phone; stack them. */
+  .ey-esim-filter-row { grid-template-columns: 1fr; }
+
+  /* Let the QR use the full column rather than a 320px cap on a narrow screen. */
+  .ey-esim-qr { max-width: 100%; }
+
+  .ey-esim-payment { padding: 1.2rem 1rem; }
+}
+
+/* ===================================================================== */
+/* Landing page purchase section ([esim_buy_cta])                         */
+/* ===================================================================== */
+
+/* Deliberately not .ey-esim-cta: page 2387 already uses that class for its
+   bottom-of-page "Not sure which package to pick?" block, and sharing it would
+   couple two unrelated components. */
+.ey-esim-buy-cta {
+  background: var(--ey-bg-soft);
+  border: 1px solid var(--ey-border);
+  border-radius: 12px;
+  padding: 1.9rem 1.6rem;
+  text-align: center;
+}
+
+.ey-esim-buy-cta .ey-esim-head { margin-bottom: 1.1rem; }
+.ey-esim-buy-cta h2 { margin: 0 0 .45rem; }
+.ey-esim-buy-cta .ey-esim-sub { max-width: 44rem; margin: 0 auto; }
+
+.ey-esim-buy-cta-action { margin: 0 0 .85rem; }
+
+.ey-esim-buy-cta a.ey-btn {
+  display: inline-block;
+  background: var(--ey-accent);
+  color: #fff;
+  text-decoration: none;
+  padding: .75rem 1.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.ey-esim-buy-cta a.ey-btn:hover { background: var(--ey-accent-hover); color: #fff; }
+.ey-esim-buy-cta a.ey-btn:focus-visible { outline: 2px solid var(--ey-accent); outline-offset: 2px; }
+
+.ey-esim-buy-cta-note {
+  margin: 0 auto;
+  max-width: 40rem;
+  color: var(--ey-muted);
+  font-size: .88rem;
+}
+
+/* ===================================================================== */
+/* Informational sections rendered in the eSIM page body (shortcode-free) */
+/* ===================================================================== */
+
+.ey-esim-section { margin: 0 0 2.5rem; }
+.ey-esim-section > h2 { margin: 0 0 .6rem; }
+.ey-esim-lede { font-size: 1.08rem; color: var(--ey-muted); max-width: 46rem; }
+
+.ey-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ey-step;
+}
+.ey-steps li {
+  counter-increment: ey-step;
+  background: var(--ey-bg-soft);
+  border: 1px solid var(--ey-border);
+  border-radius: 10px;
+  padding: 1.1rem 1.15rem 1.15rem;
+  position: relative;
+}
+.ey-steps li::before {
+  content: counter( ey-step );
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--ey-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: .95rem;
+  margin-bottom: .55rem;
+}
+.ey-steps h3 { margin: 0 0 .3rem; font-size: 1.02rem; }
+.ey-steps p { margin: 0; font-size: .9rem; color: var(--ey-muted); }
+
+/* The Voip theme ships a blanket `.main ul { list-style: initial }`
+   (themes/voip_v_4.8/voip/css/app.css). That is specificity 0,1,1 and beats a bare
+   `.ey-benefits` (0,1,0), so `initial` resolved the marker back to `disc` and every
+   one of these lists rendered a bullet dot *next to* the tick from li::below. Scope
+   these selectors under `.main` so they win. */
+.main .ey-benefits,
+.main .ey-zones,
+.main .ey-steps {
+  list-style: none;
+  list-style-type: none;
+}
+
+.ey-benefits { margin: 1.25rem 0 0; padding: 0; }
+.ey-benefits li {
+  position: relative;
+  padding-left: 1.6rem;
+  margin-bottom: .55rem;
+}
+.ey-benefits li::before {
+  content: "\2713";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--ey-accent);
+  font-weight: 700;
+}
+
+.ey-compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 0;
+}
+.ey-compare > div {
+  border: 1px solid var(--ey-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+.ey-compare h3 { margin: 0 0 .5rem; font-size: 1.05rem; }
+.ey-compare p { margin: 0 0 .6rem; font-size: .91rem; color: var(--ey-muted); }
+.ey-compare ul { margin: 0; padding-left: 1.15rem; font-size: .89rem; }
+
+/* Regional zones: the client wants the names only — no marker, no pill, no
+   background. A plain comma-free run of names reads better than a bullet list
+   here because the names are a lookup, not an ordered set of instructions. */
+.ey-zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem 1.1rem;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+.ey-zones li {
+  background: none;
+  color: inherit;
+  border-radius: 0;
+  padding: 0;
+  font-size: .93rem;
+  font-weight: 400;
+}
+
+.ey-faq { margin: 1.25rem 0 0; }
+.ey-faq details {
+  border: 1px solid var(--ey-border);
+  border-radius: 8px;
+  padding: .85rem 1.1rem;
+  margin-bottom: .6rem;
+  background: #fff;
+}
+.ey-faq summary { cursor: pointer; font-weight: 600; }
+.ey-faq details p { margin: .7rem 0 0; font-size: .92rem; color: var(--ey-muted); }
+
+.ey-esim-cta {
+  background: var(--ey-bg-soft);
+  border: 1px solid var(--ey-border);
+  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+}
+.ey-esim-cta h2 { margin: 0 0 .5rem; }
+.ey-esim-cta p { max-width: 40rem; margin: 0 auto 1.1rem; color: var(--ey-muted); }
+.ey-esim-cta a.ey-btn {
+  display: inline-block;
+  background: var(--ey-accent);
+  color: #fff;
+  text-decoration: none;
+  padding: .7rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.ey-esim-cta a.ey-btn:hover { background: var(--ey-accent-hover); color: #fff; }
+
+/* The page body uses the same custom properties as the browser block. */
+.ey-esim-page { --ey-accent: #022463; --ey-accent-hover: #011a4d; --ey-border: #e2e6ee;
+  --ey-bg-soft: #f6f8fc; --ey-text: #1f2430; --ey-muted: #6b7280; color: var(--ey-text); }

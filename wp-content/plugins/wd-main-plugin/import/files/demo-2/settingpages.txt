@@ -1,0 +1,1 @@
+a:3:{s:13:"show_on_front";s:4:"page";s:13:"page_on_front";s:4:"2080";s:14:"page_for_posts";s:2:"21";}
