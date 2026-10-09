@@ -18,18 +18,51 @@
  * @package WordPress
  */
 
+/**
+ * Load environment-specific settings from .env (schema in .env.placeholder).
+ *
+ * WordPress does not read .env files itself, so this tiny parser runs before
+ * any constant is defined. Each non-blank, non-comment line is KEY=value; a
+ * value may be wrapped in single or double quotes. Keys already defined are
+ * left alone, and missing keys simply fall through to the defaults below - so
+ * the site still boots when .env has not been created yet.
+ */
+$eyatra_env_file = __DIR__ . '/.env';
+if ( is_readable( $eyatra_env_file ) ) {
+	foreach ( file( $eyatra_env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) as $eyatra_env_line ) {
+		$eyatra_env_line = trim( $eyatra_env_line );
+		if ( '' === $eyatra_env_line || '#' === $eyatra_env_line[0] ) {
+			continue;
+		}
+		if ( false === strpos( $eyatra_env_line, '=' ) ) {
+			continue;
+		}
+		list( $eyatra_env_key, $eyatra_env_value ) = explode( '=', $eyatra_env_line, 2 );
+		$eyatra_env_key   = trim( $eyatra_env_key );
+		$eyatra_env_value = trim( $eyatra_env_value );
+		if ( strlen( $eyatra_env_value ) >= 2 && ( '"' === $eyatra_env_value[0] || "'" === $eyatra_env_value[0] ) && substr( $eyatra_env_value, -1 ) === $eyatra_env_value[0] ) {
+			$eyatra_env_value = substr( $eyatra_env_value, 1, -1 );
+		}
+		if ( ! defined( $eyatra_env_key ) ) {
+			define( $eyatra_env_key, $eyatra_env_value );
+		}
+		putenv( $eyatra_env_key . '=' . $eyatra_env_value );
+	}
+	unset( $eyatra_env_file, $eyatra_env_line, $eyatra_env_key, $eyatra_env_value );
+}
+
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'eYatraWorld' );
+define( 'DB_NAME', getenv( 'DB_NAME' ) ?: 'eYatraWorld' );
 
 /** Database username */
-define( 'DB_USER', 'root' );
+define( 'DB_USER', getenv( 'DB_USER' ) ?: 'root' );
 
 /** Database password */
-define( 'DB_PASSWORD', '' );
+define( 'DB_PASSWORD', getenv( 'DB_PASSWORD' ) ?: '' );
 
 /** Database hostname */
-define( 'DB_HOST', 'localhost' );
+define( 'DB_HOST', getenv( 'DB_HOST' ) ?: 'localhost' );
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
@@ -37,9 +70,20 @@ define( 'DB_CHARSET', 'utf8mb4' );
 /** The database collate type. Don't change this if in doubt. */
 define( 'DB_COLLATE', '' );
 
-if ( !defined('WP_CLI') ) {
-    define( 'WP_SITEURL', $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] );
-    define( 'WP_HOME',    $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] );
+// WP_HOME/WP_SITEURL come from .env when present (see above). Otherwise fall
+// back to the requested host so the site works on any domain/IP without edits.
+if ( ( ! defined( 'WP_SITEURL' ) || ! defined( 'WP_HOME' ) ) && ! defined( 'WP_CLI' ) ) {
+	$eyatra_scheme = ! empty( $_SERVER['REQUEST_SCHEME'] )
+		? $_SERVER['REQUEST_SCHEME']
+		: ( ( ! empty( $_SERVER['HTTPS'] ) && 'off' !== strtolower( $_SERVER['HTTPS'] ) ) ? 'https' : 'http' );
+	$eyatra_host   = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : 'localhost';
+	if ( ! defined( 'WP_SITEURL' ) ) {
+		define( 'WP_SITEURL', $eyatra_scheme . '://' . $eyatra_host );
+	}
+	if ( ! defined( 'WP_HOME' ) ) {
+		define( 'WP_HOME', $eyatra_scheme . '://' . $eyatra_host );
+	}
+	unset( $eyatra_scheme, $eyatra_host );
 }
 
 
@@ -98,16 +142,14 @@ define( 'WP_DEBUG', false );
 
 /**
  * eYatra SMTP relay (Gmail App Password) - plugin: eyatra-smtp.
- * Removing/commenting EYATRA_SMTP_HOST reverts wp_mail() to plain mail().
- * Full instructions + cPanel steps: C:\laragon\www\eYatraWorld_progress\TRACKING.md
+ *
+ * Values are read from .env by the loader at the top of this file (schema in
+ * .env.placeholder). Nothing is hardcoded here on purpose: with no EYATRA_SMTP_HOST
+ * constant the plugin stays a no-op and wp_mail() keeps plain mail(), and the
+ * plugin defaults port/secure and treats an empty username/password as "not
+ * configured". Full instructions + cPanel steps:
+ * C:\laragon\www\eYatraWorld_progress\TRACKING.md
  */
-define( 'EYATRA_SMTP_HOST', 'smtp.gmail.com' );
-define( 'EYATRA_SMTP_PORT', 465 );
-define( 'EYATRA_SMTP_SECURE', 'ssl' ); // 'ssl' = port 465, 'tls' = port 587.
-define( 'EYATRA_SMTP_USERNAME', 'shuvamsh531@gmail.com' );
-define( 'EYATRA_SMTP_PASSWORD', 'zgnhjvfyhosgkyec' );
-define( 'EYATRA_SMTP_FROM', 'shuvamsh531@gmail.com' );
-define( 'EYATRA_SMTP_FROM_NAME', 'eYatra' );
 
 /*
  * Never print PHP errors into page HTML.

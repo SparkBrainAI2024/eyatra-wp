@@ -14,3 +14,7 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 *.log
+
+# Local environment / secrets - template is .env.placeholder (tracked)
+.env
+.env.local

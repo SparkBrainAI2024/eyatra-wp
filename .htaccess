@@ -1,3 +1,10 @@
+# Deny direct web access to environment files (.env, .env.local, ...).
+# Apache does not block dotfiles by default, so this is required to keep the
+# DB/SMTP secrets in .env off the web.
+<FilesMatch "^\.env">
+	Require all denied
+</FilesMatch>
+
 # BEGIN WordPress
 # The directives (lines) between "BEGIN WordPress" and "END WordPress" are
 # dynamically generated, and should only be modified via WordPress filters.
