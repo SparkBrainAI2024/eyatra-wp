@@ -2,7 +2,7 @@
 /**
  * Plugin Name: eYatra eSIM
  * Description: Registers the [esim_buy_cta], [esim_browser], [esim_checkout] and [esim_recommended] shortcodes and their assets.
- * Version:     1.4.0
+ * Version:     1.5.0
  * Author:      eYatra
  *
  * A regular plugin (no longer an mu-plugin) so every file below - PHP, the
@@ -37,7 +37,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 // payment block is now rendered permanently visible instead of being revealed
 // by a wpcf7mailsent listener. Three user-visible files changed, so the
 // cache-buster moves with it.
-define( 'EYATRA_ESIM_VERSION', '1.4.0' );
+//
+// 1.4.0 -> 1.5.0 for Phase R: the stylesheet's accent token now reads the
+// eYatra Modern UI navy (var(--ey-navy)) instead of a hard-coded #022463, so the
+// catalogue and checkout match the pages around them. The stylesheet changed,
+// so the cache-buster moves with it.
+define( 'EYATRA_ESIM_VERSION', '1.5.0' );
 
 /**
  * Where the FonePay payment QR lives, relative to the uploads directory.
@@ -56,10 +61,11 @@ function eyatra_esim_csv_path() {
 }
 
 /**
- * Public URL of the package CSV.
+ * Public URL of the package CSV, carrying a `?ver=<mtime>` cache-buster so an
+ * edited CSV is refetched (see eyatra_esim_versioned_url()).
  */
 function eyatra_esim_csv_url() {
-	return content_url( 'uploads/esim/packages.csv' );
+	return eyatra_esim_versioned_url( content_url( 'uploads/esim/packages.csv' ), eyatra_esim_csv_path() );
 }
 
 /**
@@ -74,7 +80,25 @@ function eyatra_esim_featured_csv_path() {
 }
 
 function eyatra_esim_featured_csv_url() {
-	return content_url( 'uploads/esim/best-sellers.csv' );
+	return eyatra_esim_versioned_url( content_url( 'uploads/esim/best-sellers.csv' ), eyatra_esim_featured_csv_path() );
+}
+
+/**
+ * Append the file's mtime as `?ver=` so the browser refetches a CSV once it
+ * changes.
+ *
+ * Apache serves these static files with only ETag/Last-Modified and no
+ * Cache-Control, so a browser applies heuristic freshness - roughly 10% of the
+ * file's age at fetch time. These CSVs are edited rarely but then matter
+ * immediately (the curated best-sellers list drives the Recommended tab), so
+ * without a version a returning visitor can keep serving a stale shortlist for
+ * days. The mtime changes on every edit and forces a fresh fetch; when the file
+ * is unchanged the cached copy is reused exactly as before.
+ */
+function eyatra_esim_versioned_url( $url, $path ) {
+	$ver = @filemtime( $path );
+
+	return $ver ? add_query_arg( 'ver', (int) $ver, $url ) : $url;
 }
 
 /* --------------------------------------------------- server-side catalogue */

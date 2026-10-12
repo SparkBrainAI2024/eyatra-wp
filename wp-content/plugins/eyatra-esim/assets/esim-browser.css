@@ -4,8 +4,11 @@
    so the later branding pass can restyle one variable. */
 
 .eyatra-esim {
-  --ey-accent: #022463;
-  --ey-accent-hover: #011a4d;
+  /* Phase R: read the eYatra Modern UI tokens (mu-plugin eyatra-modern.css) so
+     the catalogue/checkout match the page around them. The literal fallbacks
+     keep the block correct if that sheet is ever absent (e.g. an admin preview). */
+  --ey-accent: var(--ey-navy, #022463);
+  --ey-accent-hover: var(--ey-navy-2, #011a4d);
   --ey-border: #e2e6ee;
   --ey-bg-soft: #f6f8fc;
   --ey-text: #1f2430;
@@ -170,7 +173,7 @@
 .ey-esim-badge--zone { background: #eef2ff; color: #3538cd; }
 .ey-esim-badge--topup { background: #fdf4e3; color: #92610a; }
 
-.ey-esim-data { font-size: 1.15rem; font-weight: 700; color: var(--ey-accent); }
+.ey-esim-data { font-size: 1.15rem; font-weight: 700; color: #ff7a00; }
 
 .ey-esim-meta { font-size: .8rem; color: var(--ey-muted); line-height: 1.45; }
 .ey-esim-meta span { display: block; }
@@ -719,5 +722,5 @@ a.ey-esim-buy {
 .ey-esim-cta a.ey-btn:hover { background: var(--ey-accent-hover); color: #fff; }
 
 /* The page body uses the same custom properties as the browser block. */
-.ey-esim-page { --ey-accent: #022463; --ey-accent-hover: #011a4d; --ey-border: #e2e6ee;
+.ey-esim-page { --ey-accent: var(--ey-navy, #022463); --ey-accent-hover: var(--ey-navy-2, #011a4d); --ey-border: #e2e6ee;
   --ey-bg-soft: #f6f8fc; --ey-text: #1f2430; --ey-muted: #6b7280; color: var(--ey-text); }

@@ -1,0 +1,261 @@
+/*
+ * eYatra Modern UI
+ * Removable styling shared by the Home, About, Services, Contact and eSIM pages.
+ * Every rule targets an "ey-" class, so the sheet is safe to load site-wide: on
+ * a page whose content uses none of these classes it styles nothing.
+ */
+
+:root {
+  --ey-navy: #072a5e;
+  --ey-navy-2: #022463;
+  --ey-orange: #ff7a00;
+  --ey-orange-2: #ff9a3c;
+  --ey-ink: #1f2430;
+  --ey-muted: #6b7280;
+  --ey-line: #e2e6ee;
+  --ey-soft: #f6f8fc;
+  --ey-white: #ffffff;
+}
+
+/* ---------- Generic ---------- */
+.l-main .ey-sec { padding: 56px 0; }
+.l-main .ey-sec--tight { padding: 36px 0; }
+.l-main .ey-sec--soft { background: var(--ey-soft); border-radius: 22px; }
+.l-main .ey-sec p { color: var(--ey-muted); }
+.ey-lead { font-size: 1.08rem; line-height: 1.7; color: var(--ey-muted); }
+.ey-eyebrow {
+  display: inline-block;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ey-orange);
+  margin-bottom: 10px;
+}
+
+/* WPBakery heading override (heading_extraclass="ey-heading") */
+.ey-heading.wd-heading { margin-bottom: 26px; }
+.ey-heading h2, .ey-heading h3 {
+  color: var(--ey-navy);
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+.ey-heading h4, .ey-heading .wd-heading h4 {
+  color: var(--ey-muted) !important;
+  font-weight: 500;
+}
+.ey-heading hr {
+  border: 0;
+  border-bottom: 4px solid var(--ey-orange);
+  width: 64px;
+  border-radius: 4px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.ey-heading.text-left hr { margin-left: 0 !important; margin-right: auto !important; }
+
+/* ---------- Buttons ---------- */
+.ey-btns { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.ey-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 26px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: .98rem;
+  line-height: 1;
+  text-decoration: none !important;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+}
+.ey-btn i { font-size: 1.05rem; }
+.ey-btn--primary { background: var(--ey-orange); color: var(--ey-white) !important; box-shadow: 0 10px 24px rgba(255,122,0,.32); }
+.ey-btn--primary:hover { background: var(--ey-orange-2); transform: translateY(-2px); box-shadow: 0 14px 30px rgba(255,122,0,.4); }
+.ey-btn--navy { background: var(--ey-navy); color: var(--ey-white) !important; box-shadow: 0 10px 24px rgba(7,42,94,.24); }
+.ey-btn--navy:hover { background: var(--ey-navy-2); transform: translateY(-2px); }
+.ey-btn--ghost { background: transparent; color: var(--ey-navy) !important; border: 2px solid var(--ey-line); }
+.ey-btn--ghost:hover { border-color: var(--ey-navy); transform: translateY(-2px); }
+
+/* ---------- Hero (Home) — normal block, matches About page hero ---------- */
+.ey-hero { position: relative; }
+.ey-hero-card {
+  position: relative;
+  background: linear-gradient(120deg, var(--ey-navy) 0%, #0b3a82 55%, #1246a0 100%);
+  border-radius: 22px;
+  padding: 56px 44px;
+  text-align: center;
+  color: #fff;
+}
+.ey-hero-card h1 { color: #fff; font-weight: 800; font-size: 2.35rem; margin: 0 0 12px; letter-spacing: -.02em; }
+.ey-hero-card .ey-lead { color: rgba(255,255,255,.9); max-width: 640px; margin: 0 auto 22px; }
+.ey-hero-card .ey-eyebrow { color: #ffd7a8; }
+.ey-hero-card .ey-btn--ghost { color: #fff !important; border-color: rgba(255,255,255,.5); }
+.ey-hero-card .ey-btn--ghost:hover { border-color: #fff; }
+.ey-hero-card .ey-btns { justify-content: center; }
+@media (max-width: 700px) {
+  .ey-hero-card { padding: 32px 22px; }
+  .ey-hero-card h1 { font-size: 1.7rem; }
+}
+
+/* App store badges */
+.ey-app { display: inline-flex; align-items: center; gap: 10px; background: #101828; color: #fff !important; border-radius: 12px; padding: 9px 16px; text-decoration: none !important; transition: transform .18s ease; }
+.ey-app:hover { transform: translateY(-2px); }
+.ey-app i { font-size: 1.7rem; }
+.ey-app span { display: flex; flex-direction: column; line-height: 1.15; text-align: left; }
+.ey-app small { font-size: .62rem; opacity: .8; text-transform: uppercase; letter-spacing: .08em; }
+.ey-app strong { font-size: .98rem; font-weight: 700; }
+
+/* ---------- Feature split ---------- */
+.ey-split { display: flex; flex-wrap: wrap; gap: 40px; align-items: center; }
+.ey-split > .ey-split-media, .ey-split > .ey-split-body { flex: 1 1 380px; }
+.ey-split--rev { flex-direction: row-reverse; }
+
+/* ---------- Image placeholder ---------- */
+.ey-ph {
+  position: relative;
+  border: 2px dashed #c7d1e4;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #eef3fb 0%, #f8fafe 100%);
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #8a97b0;
+  text-align: center;
+  padding: 26px;
+}
+.ey-ph i { font-size: 2.4rem; margin-bottom: 10px; color: #a9b6cc; }
+.ey-ph span { font-weight: 700; font-size: .95rem; }
+.ey-ph small { font-size: .8rem; opacity: .85; }
+.ey-ph--tall { min-height: 380px; }
+
+/* ---------- Steps ---------- */
+.ey-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.ey-step { position: relative; background: var(--ey-white); border: 1px solid var(--ey-line); border-radius: 16px; padding: 26px 22px; transition: transform .2s ease, box-shadow .2s ease; }
+.ey-step:hover { transform: translateY(-5px); box-shadow: 0 18px 40px rgba(7,42,94,.12); }
+.ey-step .ey-step-n { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ey-orange); color: #fff; font-weight: 800; margin-bottom: 14px; }
+.ey-step i { font-size: 1.5rem; color: var(--ey-navy); }
+.ey-step h3 { color: var(--ey-navy); font-size: 1.12rem; font-weight: 700; margin: 6px 0 8px; }
+.ey-step p { font-size: .92rem; margin: 0; }
+@media (max-width: 900px) { .ey-steps { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .ey-steps { grid-template-columns: 1fr; } }
+
+/* ---------- Service / icon text cards (wd_icon_text extra_classes="ey-svc") ---------- */
+.ey-svc.boxes { padding: 0; margin: 0 0 6px; }
+.ey-svc .box-container {
+  height: 100%;
+  background: var(--ey-white);
+  border: 1px solid var(--ey-line);
+  border-radius: 18px;
+  padding: 30px 26px;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  text-align: left;
+}
+.ey-svc:hover .box-container { transform: translateY(-6px); box-shadow: 0 20px 44px rgba(7,42,94,.12); border-color: transparent; }
+.ey-svc .box-icon { margin-bottom: 16px; }
+.ey-svc .box-icon i,
+.ey-svc .box-icon img { 
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 58px; height: 58px; border-radius: 14px;
+  background: rgba(255,122,0,.12); color: var(--ey-orange);
+  font-size: 1.6rem; line-height: 58px; text-align: center;
+}
+.ey-svc .box-title-6, .ey-svc .box-title-5, .ey-svc .box-title-7,
+.ey-svc h3[class*="box-title"] { color: var(--ey-navy); font-size: 1.15rem; font-weight: 700; margin: 0 0 8px; }
+.ey-svc .box-body { color: var(--ey-muted); font-size: .93rem; line-height: 1.6; margin: 0; }
+
+/* ---------- Benefits ---------- */
+.ey-benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.ey-benefit { text-align: center; padding: 28px 20px; }
+.ey-benefit i { font-size: 2rem; color: var(--ey-orange); margin-bottom: 14px; }
+.ey-benefit h3 { color: var(--ey-navy); font-size: 1.08rem; font-weight: 700; margin: 0 0 8px; }
+.ey-benefit p { font-size: .92rem; margin: 0; }
+@media (max-width: 900px) { .ey-benefits { grid-template-columns: 1fr; } }
+
+/* ---------- Stats (wrapped in .ey-stat column) ---------- */
+.ey-stats-band { background: linear-gradient(120deg, var(--ey-navy) 0%, #0b3a82 60%, #1246a0 100%); border-radius: 22px; padding: 48px 20px; }
+.ey-stat { text-align: center; }
+.ey-stat .fa { font-size: 2rem; color: var(--ey-orange); margin-bottom: 12px; }
+.ey-stat h5, .ey-stat .counter { color: var(--ey-white) !important; font-size: 2.6rem !important; font-weight: 800 !important; line-height: 1; margin: 0 0 6px; }
+.ey-stat h2 { color: rgba(255,255,255,.82) !important; font-size: .95rem !important; font-weight: 600 !important; letter-spacing: .04em; text-transform: uppercase; margin: 0; }
+
+/* ---------- FAQ ---------- */
+.ey-faq details { background: var(--ey-white); border: 1px solid var(--ey-line); border-radius: 14px; padding: 4px 20px; margin-bottom: 12px; }
+.ey-faq details[open] { border-color: rgba(255,122,0,.5); box-shadow: 0 12px 30px rgba(7,42,94,.08); }
+.ey-faq summary { cursor: pointer; list-style: none; font-weight: 700; color: var(--ey-navy); padding: 16px 0; position: relative; }
+.ey-faq summary::-webkit-details-marker { display: none; }
+.ey-faq summary::after { content: "\f067"; font-family: FontAwesome; position: absolute; right: 0; color: var(--ey-orange); }
+.ey-faq details[open] summary::after { content: "\f068"; }
+.ey-faq details p { margin: 0 0 16px; font-size: .94rem; }
+
+/* ---------- CTA band — normal block, matches About page hero ---------- */
+.ey-cta {
+  text-align: center;
+  background: linear-gradient(120deg, var(--ey-navy) 0%, #0b3a82 55%, #1246a0 100%);
+  border-radius: 22px;
+  padding: 54px 26px;
+  color: #fff;
+}
+.ey-cta h2 { color: #fff; font-weight: 800; font-size: 2rem; margin: 0 0 12px; }
+.ey-cta p { color: rgba(255,255,255,.92); max-width: 620px; margin: 0 auto 24px; }
+.ey-cta .ey-btns { justify-content: center; }
+.ey-cta .ey-btn--navy { background: #fff; color: var(--ey-navy) !important; }
+.ey-cta .ey-btn--navy:hover { background: #eef2fa; }
+.ey-cta .ey-btn { color: #fff !important; border-color: rgba(255,255,255,.5); }
+.ey-cta .ey-btn:hover { border-color: #fff; }
+.ey-cta .ey-app { background: #101828; }
+
+/* ---------- Hero (About) ---------- */
+.ey-page-hero {
+  background: linear-gradient(120deg, var(--ey-navy) 0%, #0b3a82 55%, #1246a0 100%);
+  border-radius: 22px;
+  color: #fff;
+  padding: 64px 40px;
+  text-align: center;
+}
+.ey-page-hero h1 { color: #fff; font-weight: 800; font-size: 2.5rem; margin: 0 0 14px; letter-spacing: -.02em; }
+.ey-page-hero p { color: rgba(255,255,255,.9); font-size: 1.1rem; max-width: 700px; margin: 0 auto; }
+.ey-page-hero .ey-eyebrow { color: #ffd7a8; }
+
+/* ---------- Callout / highlight ---------- */
+.ey-callout { border-left: 5px solid var(--ey-orange); background: var(--ey-soft); border-radius: 14px; padding: 26px 28px; }
+.ey-callout h3 { color: var(--ey-navy); margin: 0 0 10px; font-weight: 700; }
+
+/* ---------- Small utilities ---------- */
+.ey-center { text-align: center; }
+.ey-mt { margin-top: 26px; }
+.ey-pill { display: inline-block; background: rgba(255,122,0,.12); color: var(--ey-orange); font-weight: 700; font-size: .78rem; padding: 5px 12px; border-radius: 999px; letter-spacing: .04em; }
+/* Scoped under .l-main so it beats the theme's ".main ul{list-style:initial}".
+   Without that, the browser's disc marker and this ::before tick both render. */
+.l-main .ey-check-list { list-style: none; margin: 0; padding: 0; }
+.l-main .ey-check-list li { position: relative; padding: 7px 0 7px 32px; color: var(--ey-ink); font-size: .96rem; }
+.l-main .ey-check-list li::before { content: "\f00c"; font-family: FontAwesome; position: absolute; left: 0; top: 7px; color: var(--ey-orange); font-weight: 400; }
+
+/* ---------- Contact form (Contact Form 7 inside .ey-form) ---------- */
+.l-main .ey-form { background: var(--ey-white); border: 1px solid var(--ey-line); border-radius: 18px; padding: 30px 28px; }
+.l-main .ey-form .wpcf7-form p { margin-bottom: 16px; }
+.l-main .ey-form input[type="text"],
+.l-main .ey-form input[type="email"],
+.l-main .ey-form input[type="tel"],
+.l-main .ey-form input[type="url"],
+.l-main .ey-form input[type="number"],
+.l-main .ey-form textarea,
+.l-main .ey-form select {
+  width: 100%;
+  border: 1px solid var(--ey-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: .98rem;
+  color: var(--ey-ink);
+  background: #fff;
+}
+.l-main .ey-form input:focus,
+.l-main .ey-form textarea:focus,
+.l-main .ey-form select:focus { border-color: var(--ey-orange); outline: none; box-shadow: 0 0 0 3px rgba(255,122,0,.15); }
+.l-main .ey-form input[type="submit"],
+.l-main .ey-form .wpcf7-submit { background: var(--ey-orange); color: #fff; border: 0; border-radius: 12px; padding: 14px 30px; font-weight: 700; font-size: .98rem; cursor: pointer; transition: background .18s ease; }
+.l-main .ey-form input[type="submit"]:hover,
+.l-main .ey-form .wpcf7-submit:hover { background: var(--ey-orange-2); }
+.l-main .ey-form .wpcf7-not-valid-tip { color: #c0392b; font-size: .85rem; }
+.l-main .ey-form .wpcf7-response-output { border-radius: 10px; }
