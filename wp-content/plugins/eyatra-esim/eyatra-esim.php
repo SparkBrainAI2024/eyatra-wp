@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: eYatra eSIM
- * Description: Registers the [esim_buy_cta], [esim_browser], [esim_checkout] and [esim_recommended] shortcodes and their assets.
- * Version:     1.5.0
+ * Description: Registers the [esim_buy_cta], [esim_browser], [esim_checkout], [esim_recommended] and [esim_pay_lede] shortcodes and their assets.
+ * Version:     1.6.4
  * Author:      eYatra
  *
  * A regular plugin (no longer an mu-plugin) so every file below - PHP, the
@@ -42,7 +42,38 @@ if ( ! defined( 'ABSPATH' ) ) {
 // eYatra Modern UI navy (var(--ey-navy)) instead of a hard-coded #022463, so the
 // catalogue and checkout match the pages around them. The stylesheet changed,
 // so the cache-buster moves with it.
-define( 'EYATRA_ESIM_VERSION', '1.5.0' );
+//
+// 1.5.0 -> 1.6.0 for K3/K4 (2026-10-12): the catalogue count line now names the
+// active package type ("of 2,051 New eSIM packages") instead of a bare
+// "packages", so the "All packages" tab no longer reads as if it were showing
+// every type when its type filter defaults to New eSIM. That needs a new
+// {scope} placeholder here and a one-line change in esim-browser.js, so the
+// script changed and the cache-buster moves with it.
+//
+// 1.6.1 -> 1.6.2 for S3 (2026-10-13): the checkout rework - the 'Pay for
+// your package' QR cards moved from the plugin block into the page's builder
+// content, the bank-transfer block and the 'Questions before you pay?' panel
+// are no longer rendered, the summary gained the fixed-rate NPR equivalent,
+// and the CSS tightened the package-summary and order-form spacing.
+//
+// 1.6.2 -> 1.6.3 for T3 (2026-10-13): the checkout's package summary became two
+// centred rows (Destination / Package ID / Type / Networks, then Data / Validity
+// / Total), the "Amount:" line above each QR moved into the lede sentence via
+// the new [esim_pay_lede] shortcode (replacing [esim_order_amount]), and the
+// payment cards centre as a capped pair. The stylesheet and the script (the
+// catalogue "Show more" button now stays hidden on the Recommended tab) both
+// changed, so the cache-buster moves with them.
+//
+// 1.6.3 -> 1.6.4 for T5 (2026-10-13): the checkout summary's second row gained
+// its own "Nepalese rupees" cell, so the NPR equivalent prints beside the USD
+// total instead of underneath it, and both rows now share one four-column grid
+// so every cell lines up. Stylesheet only, but it moved, so the buster moves.
+define( 'EYATRA_ESIM_VERSION', '1.6.4' );
+
+// Fixed USD -> NPR rate for the checkout NPR equivalent (S3, 2026-10-13).
+// One editable constant rather than a live FX call; refresh the value and the
+// date when the market moves materially. Filtered by 'eyatra_esim_npr_rate'.
+define( 'EYATRA_ESIM_NPR_RATE_USD', 153.44 );
 
 /**
  * Where the FonePay payment QR lives, relative to the uploads directory.
@@ -74,8 +105,7 @@ function eyatra_esim_csv_url() {
  * Kept in its own file so the featured grid can be changed without touching
  * PHP or JS. Every id is asserted against packages.csv by
  * _backup/phase-C/check_featured.php - a typo here silently drops a card.
- */
-function eyatra_esim_featured_csv_path() {
+ */function eyatra_esim_featured_csv_path() {
 	return WP_CONTENT_DIR . '/uploads/esim/best-sellers.csv';
 }
 
@@ -241,6 +271,26 @@ function eyatra_esim_price_label( $package ) {
 	}
 
 	return $symbol . number_format_i18n( (float) $package['price'], 2 ) . ' USD';
+}
+
+/**
+ * The fixed USD -> NPR rate the checkout's NPR equivalent uses.
+ *
+ * Backed by the EYATRA_ESIM_NPR_RATE_USD constant (set 2026-10-13) so there
+ * is no live FX dependency on the checkout page; filterable like every other
+ * source of truth in this plugin.
+ */
+function eyatra_esim_npr_rate() {
+	$rate = defined( 'EYATRA_ESIM_NPR_RATE_USD' ) ? (float) EYATRA_ESIM_NPR_RATE_USD : 153.44;
+	return (float) apply_filters( 'eyatra_esim_npr_rate', $rate );
+}
+
+/**
+ * The NPR equivalent of a package price, e.g. "NPR 6,384" for $48.
+ */
+function eyatra_esim_npr_label( $package ) {
+	$npr = round( (float) $package['price'] * eyatra_esim_npr_rate() );
+	return 'NPR ' . number_format_i18n( $npr, 0 );
 }
 
 /**
@@ -428,7 +478,9 @@ function eyatra_esim_enquiry_form_id() {
  * value into ({dur}, {n}) live here.
  *
  * Placeholders replaced by the script: {shown}, {total}, {plural}, {ofTotal},
- * {dur}, {n}. Anything else in a value is output as-is - these strings are
+ * {scope}, {dur}, {n}. {scope} is the active package type ("New eSIM " /
+ * "Top-up ") or empty on the All types filter; it exists so the count line says
+ * what is actually listed. Anything else in a value is output as-is - these strings are
  * written into innerHTML, so an edit may contain markup (the count lines use
  * <strong> and &middot;) but must never contain a value from the CSV; those go
  * through the script's textContent slots.
@@ -443,7 +495,7 @@ function eyatra_esim_js_strings() {
 		'emptyFeatured'         => 'Our recommended list is empty right now.',
 		'emptyFeaturedUpdating' => 'Our recommended list is being updated. Use the All packages tab to browse every package.',
 		'emptyTeaserUpdating'   => 'Our recommended list is being updated.',
-		'countAll'              => 'Showing <strong>{shown}</strong> of <strong>{total}</strong> package{plural} &middot; prices in USD',
+		'countAll'              => 'Showing <strong>{shown}</strong> of <strong>{total}</strong> {scope}package{plural} &middot; prices in USD',
 		'countRecommended'      => 'Showing <strong>{shown}</strong> of <strong>{total}</strong> recommended package{plural} &middot; prices in USD',
 		'countTeaser'           => 'Showing <strong>{shown}</strong>{ofTotal} recommended package{plural} &middot; prices in USD',
 		// Per-row formats the script fills into the card's textContent slots.
@@ -787,27 +839,53 @@ function eyatra_esim_render_checkout( $atts ) {
 			<h3 class="ey-esim-checkout-title">Your package</h3>
 
 			<dl class="ey-esim-summary">
-				<dt>Destination</dt>
-				<dd><?php echo esc_html( $package['country'] ); ?></dd>
+				<div class="ey-esim-summary-row">
+					<div class="ey-esim-summary-cell">
+						<dt>Destination</dt>
+						<dd><?php echo esc_html( $package['country'] ); ?></dd>
+					</div>
 
-				<dt>Data</dt>
-				<dd><?php echo esc_html( $package['data'] ); ?></dd>
+					<div class="ey-esim-summary-cell">
+						<dt>Package ID</dt>
+						<dd><?php echo esc_html( $package['pkg'] ); ?></dd>
+					</div>
 
-				<?php if ( $package['dur'] ) : ?>
-					<dt>Validity</dt>
-					<dd><?php echo esc_html( $package['dur'] ); ?></dd>
-				<?php endif; ?>
+					<div class="ey-esim-summary-cell">
+						<dt>Type</dt>
+						<dd><?php echo esc_html( $package['type'] ); ?></dd>
+					</div>
 
-				<?php if ( eyatra_esim_net_label( $package['net'] ) ) : ?>
-					<dt>Networks</dt>
-					<dd><?php echo esc_html( eyatra_esim_net_label( $package['net'] ) ); ?></dd>
-				<?php endif; ?>
+					<?php if ( eyatra_esim_net_label( $package['net'] ) ) : ?>
+						<div class="ey-esim-summary-cell">
+							<dt>Networks</dt>
+							<dd><?php echo esc_html( eyatra_esim_net_label( $package['net'] ) ); ?></dd>
+						</div>
+					<?php endif; ?>
+				</div>
 
-				<dt>Package ID</dt>
-				<dd><code><?php echo esc_html( $package['pkg'] ); ?></code></dd>
+				<div class="ey-esim-summary-row">
+					<div class="ey-esim-summary-cell">
+						<dt>Data</dt>
+						<dd><?php echo esc_html( $package['data'] ); ?></dd>
+					</div>
 
-				<dt class="ey-esim-summary-price">Total</dt>
-				<dd class="ey-esim-summary-price"><?php echo esc_html( eyatra_esim_price_label( $package ) ); ?></dd>
+					<?php if ( $package['dur'] ) : ?>
+						<div class="ey-esim-summary-cell">
+							<dt>Validity</dt>
+							<dd><?php echo esc_html( $package['dur'] ); ?></dd>
+						</div>
+					<?php endif; ?>
+
+					<div class="ey-esim-summary-cell ey-esim-summary-cell--total">
+						<dt class="ey-esim-summary-price">Total price</dt>
+						<dd class="ey-esim-summary-price"><?php echo esc_html( eyatra_esim_price_label( $package ) ); ?></dd>
+					</div>
+
+					<div class="ey-esim-summary-cell ey-esim-summary-cell--npr">
+						<dt class="ey-esim-summary-price ey-esim-summary-price--orange">Equivalent Nepalese rupees</dt>
+						<dd class="ey-esim-summary-price ey-esim-summary-price--orange"><?php echo esc_html( eyatra_esim_npr_label( $package ) ); ?></dd>
+					</div>
+				</div>
 			</dl>
 
 			<h3 class="ey-esim-checkout-title">Your details</h3>
@@ -823,15 +901,13 @@ function eyatra_esim_render_checkout( $atts ) {
 				<?php endif; ?>
 			</div>
 
-			<?php echo eyatra_esim_render_payment(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the helper ?>
-
 			<?php
-			echo eyatra_esim_render_contact( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the helper
-				array(
-					'title' => 'Questions before you pay?',
-					'note'  => 'Send us a message and we will help you pick the right package.',
-				)
-			);
+			// S3 (2026-10-13): the 'Pay for your package' QR cards are builder
+			// content in the page (#esim-pay); eyatra_esim_render_payment() and
+			// eyatra_esim_render_contact() stay defined as the operator's
+			// source-of-truth helpers but are no longer echoed here, so the
+			// bank-transfer block and the 'Questions before you pay?' panel are
+			// gone from the rendered checkout.
 			?>
 		<?php endif; ?>
 	</section>
@@ -839,6 +915,24 @@ function eyatra_esim_render_checkout( $atts ) {
 	return ob_get_clean();
 }
 add_shortcode( 'esim_checkout', 'eyatra_esim_render_checkout' );
+
+/**
+ * The checkout payment lede, with the selected package's total inside it (T3).
+ *
+ * S3 printed the NPR total as its own "Amount:" line above each QR; the
+ * sign-off asked for a single sentence instead. Without a usable ?pkg= the
+ * sentence drops the price clause rather than printing a placeholder, so the
+ * copy still reads cleanly before a package is chosen.
+ */
+function eyatra_esim_pay_lede_shortcode() {
+	$package = eyatra_esim_find_package( eyatra_esim_requested_package_id() );
+	if ( ! $package ) {
+		return 'Pay your package total in Nepalese rupees with either QR below.';
+	}
+	return 'Pay your package total of <strong>' . esc_html( eyatra_esim_npr_label( $package ) )
+		. '</strong> in Nepalese rupees with either QR below.';
+}
+add_shortcode( 'esim_pay_lede', 'eyatra_esim_pay_lede_shortcode' );
 
 /**
  * Re-derive the hidden package fields server-side on every submission.
@@ -872,6 +966,8 @@ function eyatra_esim_rederive_posted_package_data( $posted ) {
 	$posted['esim-data']        = $package['data'];
 	$posted['esim-duration']    = $package['dur'];
 	$posted['esim-price']       = eyatra_esim_price_label( $package );
+	$posted['esim-npr-price']   = eyatra_esim_npr_label( $package );
+	$posted['esim-conversion-rate'] = eyatra_esim_npr_rate();
 
 	return $posted;
 }

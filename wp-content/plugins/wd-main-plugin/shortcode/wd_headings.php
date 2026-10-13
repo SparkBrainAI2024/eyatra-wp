@@ -14,7 +14,12 @@ if(!function_exists('wd_headings')){
 			'title'  => 'this is a title',
 			'headings_title'  => 'The title..',
 			'headings_title_tag'  => 'h2',
-			'headings_subtitle'  => 'subtitle',
+			// T2 (2026-10-13): the old default was the literal 'subtitle', so
+			// every heading that did not pass one rendered an <h4>subtitle</h4>
+			// placeholder (five of the eight headings on /esim/). The render
+			// below already skips an empty subtitle, so defaulting to '' drops
+			// the stray line without touching any authored subtitle text.
+			'headings_subtitle'  => '',
 			'headings_subtitle_tag'  => 'h4',
 			'headings_layout' => 's-under-t',
 			'headings_alignment' => 'center',

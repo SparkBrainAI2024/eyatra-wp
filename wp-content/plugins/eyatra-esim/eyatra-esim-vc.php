@@ -23,8 +23,11 @@
  *     id (esim-q, esim-dest, esim-data, esim-type, esim-sort, esim-results) and
  *     buildFilters()/apply() dereference them with no null guard, so the block
  *     cannot be hand-written as static HTML.
- *   - [esim_checkout] resolves ?pkg= server-side against packages.csv, embeds
- *     the Contact Form 7 order form by form slug and renders the FonePay QR.
+ *   - [esim_checkout] resolves ?pkg= server-side against packages.csv, shows the
+ *     selected package summary and embeds the Contact Form 7 order form by form
+ *     slug. The payment QRs are NOT rendered here since S3 (2026-10-13): they
+ *     are builder content on /esim-checkout/, so the operator swaps a PNG
+ *     instead of editing PHP.
  *     Its hidden price fields are re-derived server-side on submission by
  *     eyatra_esim_rederive_posted_package_data().
  *
@@ -173,7 +176,7 @@ function eyatra_esim_vc_register_elements() {
 			'base'        => 'esim_checkout',
 			'category'    => 'eYatra',
 			'icon'        => 'icon-wpb-call-to-action',
-			'description' => 'The order block: the selected package summary, the Contact Form 7 order form, and the FonePay QR plus bank transfer details below it. The summary, price and form are produced by PHP from the ?pkg= parameter, so there is no editable text here - only the heading. This block must stay on /esim-checkout/; the package id arrives in the link from the package browser.',
+			'description' => 'The order block: the selected package summary (with the NPR equivalent of the USD price) and the Contact Form 7 order form. The summary, price and form are produced by PHP from the ?pkg= parameter, so there is no editable text here - only the heading. The payment QRs and bank details are NOT part of this block since S3 (2026-10-13): they are builder content above it, so the operator swaps the QR images without code. This block must stay on /esim-checkout/; the package id arrives in the link from the package browser.',
 			'content_element' => false,
 			'params'      => array(
 				eyatra_esim_vc_textfield(

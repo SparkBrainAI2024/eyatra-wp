@@ -81,17 +81,14 @@
   			<!--.l-footer-->
   			<footer class="l-footer">
   				<div class="row">
-  					<div class="footer large-4 columns">
+  					<div class="footer large-6 columns">
   						<section class="block">
-  							<span><?php echo esc_html__('Powered by', 'voip'); ?> <a href="<?php echo esc_url(home_url('/')); ?>"><?php echo  voip_get_option('wd_poweredby','voip') ?></a></span>
+  							<span><?php echo esc_html(voip_get_option('wd_copyright','&copy; 2022 voip All rights reserved. ')); ?></span>
   						</section>
   					</div>
-  					<div class="large-4 columns">
-  						
-  					</div>
-  					<div class="copyright large-4 text-right columns">
+  					<div class="copyright large-6 text-right columns">
   						<p>
-  						<?php  echo esc_html(voip_get_option('wd_copyright','&copy; 2022 voip All rights reserved. '));   ?>
+  						<?php echo esc_html__('eYatra is powered by', 'voip'); ?> <a href="<?php echo esc_url(home_url('/')); ?>"><?php echo esc_html(voip_get_option('wd_poweredby','voip')); ?></a>
   						</p>
   					</div>
   				</div>

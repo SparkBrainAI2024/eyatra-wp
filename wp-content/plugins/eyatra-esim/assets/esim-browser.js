@@ -32,7 +32,11 @@
 	'use strict';
 
 	var cfg = window.eyatraEsim || {};
-	var PER_PAGE = cfg.perPage || 60;
+	// T3 (2026-10-13): wp_localize_script stringifies every scalar, so cfg.perPage
+	// arrives as "60". Without the parseInt, `shown + PER_PAGE` was string
+	// concatenation on the second page ("60" + "60" -> "6060"), and the first
+	// "Show more packages" click rendered the whole 2,051-row catalogue at once.
+	var PER_PAGE = parseInt( cfg.perPage, 10 ) || 60;
 	var SYMBOL = cfg.symbol || '$';
 	var S = cfg.strings || {};
 
@@ -544,7 +548,11 @@
 		el.count.innerHTML = fillStr( featuredView ? S.countRecommended : S.countAll, {
 			shown: shown,
 			total: total,
-			plural: total === 1 ? '' : 's'
+			plural: total === 1 ? '' : 's',
+			// Name the active type so "All packages" does not read as if it
+			// were showing every type while the type filter sits on New eSIM.
+			// Empty on the All types option (whose value is "").
+			scope: ( ! featuredView && el.type && el.type.value ) ? el.type.value + ' ' : ''
 		} );
 
 		el.more.hidden = featuredView || shown >= total;
@@ -702,7 +710,14 @@
 		}
 
 		if ( el.more ) {
-			el.more.addEventListener( 'click', render );
+			// T1 (2026-10-13): the button is hidden on the Recommended tab
+			// (the stylesheet's [hidden] rule now enforces that), but guard
+			// here too - the recommended list is only 16 rows, so "paging" it
+			// would append the same 16 rows a second time.
+			el.more.addEventListener( 'click', function () {
+				if ( 'featured' === view ) { return; }
+				render();
+			} );
 		}
 
 		if ( el.reset ) {

@@ -84,6 +84,16 @@
      added on top, making Search render about 23px wider than the select beside
      it. Forcing border-box on both controls keeps them equal. */
   box-sizing: border-box;
+  /* The Voip theme fixes input[type=search] at height 2.4375rem and gives
+     every input and select a 1rem bottom margin (app.css). Inside the flex
+     fields those land unevenly -- Search is a fixed 39px box with a 1rem
+     margin, the Destination select is intrinsic with its own 1rem margin --
+     so the Search label/box sat lower than the Destination label/dropdown
+     beside them. Pinning one height and dropping the theme margin puts
+     both label rows and both control rows on the same baselines across
+     every row of the filter bar. */
+  height: 2.625rem;
+  margin: 0;
   padding: .55rem .65rem;
   border: 1px solid var(--ey-border);
   border-radius: 6px;
@@ -100,6 +110,8 @@
 }
 
 .ey-esim-reset {
+  min-height: 2.625rem;
+  margin: 0;
   padding: .55rem 1rem;
   border: 1px solid var(--ey-border);
   border-radius: 6px;
@@ -240,6 +252,12 @@
 }
 .ey-esim-more:hover { border-color: var(--ey-accent); }
 
+/* T1 (2026-10-13): the rule above sets display:block, which beats the UA
+   [hidden]{display:none}, so "Show more packages" stayed visible on the
+   Recommended tab. There render() would append the same 16 rows a second time.
+   This puts [hidden] back in charge. */
+.ey-esim-more[hidden] { display: none; }
+
 /* ---------- tabs ---------- */
 .ey-esim-tabs {
   display: flex;
@@ -271,7 +289,7 @@
 .ey-esim-tab:focus-visible { outline: 2px solid var(--ey-accent); outline-offset: 2px; }
 
 /* ---------- checkout ---------- */
-.ey-esim-checkout-title { margin: 1.6rem 0 .7rem; }
+.ey-esim-checkout-title { margin: 1.15rem 0 .5rem; }
 
 .ey-esim-summary {
   margin: 0;
@@ -279,8 +297,24 @@
   border-left: 4px solid var(--ey-accent);
   border-radius: 10px;
   background: #fbfcff;
-  padding: 1rem 1.15rem;
+  padding: .85rem 1rem;
+  text-align: left;
 }
+
+/* T3/T5 (2026-10-13): the summary is two rows of label/value cells - the
+   identity fields (Destination / Package ID / Type / Networks) then the plan
+   fields (Data / Validity / Total price / Equivalent Nepalese rupee). Both rows
+   are the same four-column grid, so every cell shares a column width and the
+   two rows line up; the values sit left-aligned inside each cell. */
+.ey-esim-summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .7rem 1rem;
+}
+
+.ey-esim-summary-row + .ey-esim-summary-row { margin-top: .7rem; }
+
+.ey-esim-summary-cell { min-width: 0; }
 
 .ey-esim-summary dt {
   color: var(--ey-muted);
@@ -288,11 +322,11 @@
   font-weight: 700;
   letter-spacing: .04em;
   text-transform: uppercase;
-  padding-top: .55rem;
+  padding-top: .2rem;
 }
 
 .ey-esim-summary dd {
-  margin: 0 0 .15rem;
+  margin: 0 0 .1rem;
   font-weight: 600;
   word-break: break-word;
 }
@@ -302,6 +336,23 @@
   font-size: 1.15rem;
   color: var(--ey-accent);
   margin-bottom: 0;
+}
+
+/* The fixed-rate NPR equivalent (S3) is its own cell in row 2 now (T5), so it
+   is styled as a plain secondary value instead of a block under the total. */
+.ey-esim-summary .ey-esim-summary-npr {
+  margin: 0 0 .1rem;
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--ey-muted);
+}
+
+/* The NPR equivalent cell keeps the exact Total-price font (it carries the
+   same .ey-esim-summary-price class) and only swaps colour to the brand
+   orange (--ey-orange from the Modern UI kit; literal fallback included). */
+.ey-esim-summary dt.ey-esim-summary-price--orange,
+.ey-esim-summary dd.ey-esim-summary-price--orange {
+  color: var(--ey-orange, #ff7a00);
 }
 
 .ey-esim-summary code,
@@ -351,10 +402,41 @@
   width: 100%;
   max-width: 320px;
   height: auto;
+  margin: 0 auto;
   border: 1px solid var(--ey-border);
   border-radius: 8px;
   background: #fff;
 }
+
+/* ---------- payment cards (S3/T3 builder section, #esim-pay) ---------- */
+.ey-pay { margin: 1.4rem auto 0; max-width: 46rem; text-align: center; }
+.ey-pay h3 { margin: 0 0 .55rem; }
+.ey-pay p.ey-pay-lede { margin: 0 auto 1.1rem; max-width: 46rem; color: var(--ey-muted); }
+
+/* T3 (2026-10-13): the two QR cards centre as one capped pair, and wrap to a
+   single column on narrow screens. */
+.ey-pay-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.1rem;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.ey-pay-card {
+  flex: 1 1 16rem;
+  max-width: 24rem;
+  border: 1px solid var(--ey-border);
+  border-left: 4px solid var(--ey-accent);
+  border-radius: 12px;
+  padding: 1.15rem 1.05rem;
+  background: #fbfcff;
+  min-width: 0;
+  text-align: center;
+}
+.ey-pay-card h4 { margin: 0 0 .75rem; font-size: 1rem; }
+
 
 .ey-esim-payment-hint {
   margin: .7rem 0 0;
@@ -424,19 +506,26 @@
 /* ---------- Contact Form 7, scoped to the checkout form ---------- */
 .ey-esim-checkout-form .wpcf7 { margin: 0; }
 
-/* Contact Form 7 turns each newline in its form template into a literal <br />.
-   Those breaks sat between the fields and rendered a blank line above every
-   input, so the form looked like it had double the spacing it actually had.
-   The labels themselves are kept on one line in the template (see
-   create_enquiry_form.php), so nothing inside a <label> depends on this rule. */
-.ey-esim-checkout-form .wpcf7-form > br { display: none; }
+/* Contact Form 7 renders the whole template inside a single <p> and turns every
+   newline into a literal <br />. Those <br /> are grandchildren of the form
+   (they sit inside the <p>), so the old direct-child rule (.wpcf7-form > br)
+   matched none of them: every one of them rendered as an empty line, and the
+   run of them before the submit button stacked into a big blank gap above
+   "Place order". They are hidden here with a plain descendant selector, and the
+   spacing they used to provide is carried by the field rule below instead, so
+   the fields keep even gaps without depending on template newlines. */
+.ey-esim-checkout-form .wpcf7-form br { display: none; }
+.ey-esim-checkout-form .wpcf7-form p { margin: 0; }
 
-.ey-esim-checkout-form .wpcf7-form > label {
+.ey-esim-checkout-form .wpcf7-form label {
   display: block;
-  margin-bottom: .55rem;
+  margin-bottom: .45rem;
 }
 
-.ey-esim-checkout-form .wpcf7-form .wpcf7-form-control-wrap { display: block; }
+.ey-esim-checkout-form .wpcf7-form .wpcf7-form-control-wrap {
+  display: block;
+  margin-bottom: 1rem;
+}
 
 .ey-esim-checkout-form input[type="text"],
 .ey-esim-checkout-form input[type="email"],
@@ -445,6 +534,16 @@
   width: 100%;
   max-width: 34rem;
   box-sizing: border-box;
+  /* The Voip theme fixes input[type=search] at height 2.4375rem and gives
+     every input and select a 1rem bottom margin (app.css). Inside the flex
+     fields those land unevenly -- Search is a fixed 39px box with a 1rem
+     margin, the Destination select is intrinsic with its own 1rem margin --
+     so the Search label/box sat lower than the Destination label/dropdown
+     beside them. Pinning one height and dropping the theme margin puts
+     both label rows and both control rows on the same baselines across
+     every row of the filter bar. */
+  height: 2.625rem;
+  margin: 0;
   padding: .55rem .65rem;
   border: 1px solid var(--ey-border);
   border-radius: 6px;
@@ -540,6 +639,10 @@ a.ey-esim-buy {
 
   /* Two labelled controls per row is too tight on a phone; stack them. */
   .ey-esim-filter-row { grid-template-columns: 1fr; }
+
+  /* Four summary columns are unreadable on a phone; fall back to two, which
+     keeps each label/value pair on one line. */
+  .ey-esim-summary-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   /* Let the QR use the full column rather than a 320px cap on a narrow screen. */
   .ey-esim-qr { max-width: 100%; }
